@@ -1,0 +1,92 @@
+from random import shuffle
+
+
+class Deck:
+    def __init__(self):
+        self.data = []
+        self.to_num = {'2': 2,
+                       '3': 3,
+                       '4': 4,
+                       '5': 5,
+                       '6': 6,
+                       '7': 7,
+                       '8': 8,
+                       '9': 9,
+                       '10': 10,
+                       'J': 10,
+                       'Q': 10,
+                       'K': 10
+                       }
+        self.possible_cards = ['J', 'Q', 'K']
+        for i in range(10):
+            self.possible_cards += [str(i + 1)]
+
+    def add_card(self, card):
+        if not(isinstance(card, str) and self.possible_cards.count(card)):
+            raise TypeError('Wrong type of card!')
+        self.data += [card]
+
+    def get_card(self):
+        return self.data.pop()
+
+    def shuffle_deck(self):
+        shuffle(self.data)
+
+    def clear_deck(self):
+        self.data = []
+
+    def get_sum(self):
+        result = 0
+        count_of_one = 0
+        for i in self.data:
+            if i != '1':
+                result += self.to_num[i]
+            else:
+                count_of_one += 1
+        min_result = result + count_of_one
+        max_result = result + 11 * (count_of_one > 0) + max(count_of_one - 1, 0)
+        if max_result > 21:
+            return min_result
+        return max_result
+
+    def fill_deck(self):
+        self.clear_deck()
+        for i in range(10):
+            self.data += 4 * [str(i + 1)]
+        self.data += 4 * list(str('J'))
+        self.data += 4 * list(str('Q'))
+        self.data += 4 * list(str('K'))
+
+
+class Dealer:
+    def __init__(self):
+        self.deck = Deck()
+
+    def get_deck(self):
+        return self.deck.data
+
+    def take_card(self, card):
+        self.deck.add_card(card)
+
+
+class Player:
+    def __init__(self, start_balance=10000):
+        self.deck = Deck()
+        self.balance = start_balance
+        self.bet = 0
+        self.in_game = False
+
+    def update_bet(self, new_bet):
+        if not isinstance(new_bet, int):
+            raise TypeError
+        if new_bet > self.balance:
+            raise ValueError
+        self.balance += self.bet
+        self.bet = new_bet
+        self.balance -= self.bet
+
+    def get_deck(self):
+        return self.deck.data
+
+    def take_card(self, card):
+        self.deck.add_card(card)
