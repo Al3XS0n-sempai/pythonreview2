@@ -1,30 +1,31 @@
 from random import shuffle
 
+limit = 21
+
+
+class Server:
+    def __init__(self):
+        self.address = '::'
+        self.port = '8888'
+
 
 class Deck:
     def __init__(self):
         self.data = []
-        self.to_num = {'2': 2,
-                       '3': 3,
-                       '4': 4,
-                       '5': 5,
-                       '6': 6,
-                       '7': 7,
-                       '8': 8,
-                       '9': 9,
-                       '10': 10,
-                       'J': 10,
-                       'Q': 10,
-                       'K': 10
-                       }
+        self.to_num = {}
         self.possible_cards = ['J', 'Q', 'K']
         for i in range(10):
             self.possible_cards += [str(i + 1)]
+        for i in self.possible_cards:
+            if not (i == 'J' or i == 'Q' or i == 'K'):
+                self.to_num[i] = int(i)
+            else:
+                self.to_num[i] = 10
 
     def add_card(self, card):
         if not(isinstance(card, str) and self.possible_cards.count(card)):
             raise TypeError('Wrong type of card!')
-        self.data += [card]
+        self.data.append(card)
 
     def get_card(self):
         return self.data.pop()
@@ -51,11 +52,7 @@ class Deck:
 
     def fill_deck(self):
         self.clear_deck()
-        for i in range(10):
-            self.data += 4 * [str(i + 1)]
-        self.data += 4 * list(str('J'))
-        self.data += 4 * list(str('Q'))
-        self.data += 4 * list(str('K'))
+        self.data = 4 * self.possible_cards
 
 
 class Dealer:

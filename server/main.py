@@ -6,6 +6,8 @@ app = Flask('BlackJack')
 deck = libs.Deck()
 dealer = libs.Dealer()
 player = libs.Player()
+limit = libs.limit
+current_server = libs.Server()
 
 
 @app.route('/change_bet', methods=['POST'])
@@ -67,7 +69,7 @@ def double():
 def more():
     card = deck.get_card()
     player.deck.add_card(card)
-    if player.deck.get_sum() > 21:
+    if player.deck.get_sum() > limit:
         return all_in_game()
     return 'success'
 
@@ -94,15 +96,15 @@ def start_game():
 def who_is_win():
     dealer_sum = dealer.deck.get_sum()
     player_sum = player.deck.get_sum()
-    if player_sum > 21:
-        if dealer_sum <= 21:
+    if player_sum > limit:
+        if dealer_sum <= limit:
             lost()
             return f'You lost, your sum={player_sum}, dealer sum={dealer_sum}!'
         else:
             draw()
             return f'Draw, your sum={player_sum}, dealer sum={dealer_sum}!'
     else:
-        if dealer_sum > 21 or dealer_sum < player_sum:
+        if dealer_sum > limit or dealer_sum < player_sum:
             win()
             return f'You win, your sum={player_sum}, dealer sum={dealer_sum}!'
         elif dealer_sum == player_sum:
@@ -131,7 +133,7 @@ def draw():
 
 
 def main():
-    app.run('::', port=8888)
+    app.run(current_server.address, port=current_server.port)
 
 
 if __name__ == '__main__':
