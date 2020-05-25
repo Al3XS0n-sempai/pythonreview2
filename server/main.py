@@ -9,7 +9,7 @@ deck = libs.Deck()
 dealer = libs.Dealer()
 player = libs.Player()
 config = configparser.ConfigParser()
-config.read('setting.ini')
+config.read('settings.ini')
 
 
 def create_main_parser():
@@ -129,7 +129,7 @@ def who_is_win():
             return answer('draw')
         else:
             lost()
-            return answer('lose')
+            return answer('lost')
 
 
 def lost():
