@@ -1,13 +1,22 @@
 from flask import Flask
 from flask import request
+import configparser
+import argparse
 import libs
 
 app = Flask('BlackJack')
 deck = libs.Deck()
 dealer = libs.Dealer()
 player = libs.Player()
-limit = libs.limit
-current_server = libs.Server()
+config = configparser.ConfigParser()
+config.read('setting.ini')
+
+
+def create_main_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', default='::')
+    parser.add_argument('--port', default=8888, type=int)
+    return parser
 
 
 @app.route('/change_bet', methods=['POST'])
@@ -69,7 +78,7 @@ def double():
 def more():
     card = deck.get_card()
     player.deck.add_card(card)
-    if player.deck.get_sum() > limit:
+    if player.deck.get_sum() > libs.LIMIT:
         return all_in_game()
     return 'success'
 
@@ -93,26 +102,34 @@ def start_game():
         dealer.take_card(dealer_card)
 
 
+def answer(res):
+    return config.get('Phrases', res)
+
+
 def who_is_win():
     dealer_sum = dealer.deck.get_sum()
     player_sum = player.deck.get_sum()
-    if player_sum > limit:
-        if dealer_sum <= limit:
+    config.set('Phrases', 'player_sum', str(player_sum))
+    config.set('Phrases', 'dealer_sum', str(dealer_sum))
+    with open('settings.ini', 'w') as config_file:
+        config.write(config_file)
+    if player_sum > libs.LIMIT:
+        if dealer_sum <= libs.LIMIT:
             lost()
-            return f'You lost, your sum={player_sum}, dealer sum={dealer_sum}!'
+            return answer('win')
         else:
             draw()
-            return f'Draw, your sum={player_sum}, dealer sum={dealer_sum}!'
+            return answer('draw')
     else:
-        if dealer_sum > limit or dealer_sum < player_sum:
+        if dealer_sum > libs.LIMIT or dealer_sum < player_sum:
             win()
-            return f'You win, your sum={player_sum}, dealer sum={dealer_sum}!'
+            return answer('win')
         elif dealer_sum == player_sum:
             draw()
-            return f'Draw, your sum={player_sum}, dealer sum={dealer_sum}!'
+            return answer('draw')
         else:
             lost()
-            return f'You lost, your sum={player_sum}, dealer sum={dealer_sum}!'
+            return answer('lose')
 
 
 def lost():
@@ -133,7 +150,9 @@ def draw():
 
 
 def main():
-    app.run(current_server.address, port=current_server.port)
+    main_parser = create_main_parser()
+    current_server = main_parser.parse_args()
+    app.run(current_server.host, port=current_server.port)
 
 
 if __name__ == '__main__':

@@ -1,12 +1,6 @@
 from random import shuffle
 
-limit = 21
-
-
-class Server:
-    def __init__(self):
-        self.address = '::'
-        self.port = '8888'
+LIMIT = 21
 
 
 class Deck:
@@ -14,8 +8,7 @@ class Deck:
         self.data = []
         self.to_num = {}
         self.possible_cards = ['J', 'Q', 'K']
-        for i in range(10):
-            self.possible_cards += [str(i + 1)]
+        self.possible_cards.extend([str(i) for i in range(1, 11)])
         for i in self.possible_cards:
             if not (i == 'J' or i == 'Q' or i == 'K'):
                 self.to_num[i] = int(i)
