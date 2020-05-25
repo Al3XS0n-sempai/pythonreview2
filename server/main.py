@@ -66,16 +66,20 @@ def get_bet():
 
 @app.route('/double', methods=['POST'])
 def double():
+    if not player.in_game:
+        return 'You are not in game!'
     if player.balance < player.bet:
         return 'You do not have enough money!'
     player.update_bet(2 * player.bet)
     card = deck.get_card()
     player.take_card(card)
-    return 'Doubled!\n' + all_in_game()
+    return 'Doubled! ' + all_in_game()
 
 
 @app.route('/more', methods=['POST'])
 def more():
+    if not player.in_game:
+        return 'You are not in game!'
     card = deck.get_card()
     player.deck.add_card(card)
     if player.deck.get_sum() > libs.LIMIT:
@@ -85,7 +89,10 @@ def more():
 
 @app.route('/all', methods=['POST'])
 def all_in_game():
-    result = who_is_win()
+    if player.in_game:
+        result = who_is_win()
+    else:
+        result = 'You are not in game!'
     return result
 
 
