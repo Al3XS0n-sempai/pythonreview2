@@ -7,10 +7,12 @@ class Deck:
     def __init__(self):
         self.data = []
         self.to_num = {}
-        self.possible_cards = ['J', 'Q', 'K', 'A']
+        self.char_cards = ['J', 'Q', 'K', 'A']
+        self.possible_cards = []
+        self.possible_cards.extend(self.char_cards)
         self.possible_cards.extend([str(i) for i in range(2, 11)])
         for i in self.possible_cards:
-            if not (i == 'J' or i == 'Q' or i == 'K' or i == 'A'):
+            if not (i in self.char_cards):
                 self.to_num[i] = int(i)
             elif i == 'A':
                 self.to_num[i] = 1
